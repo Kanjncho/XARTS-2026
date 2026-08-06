@@ -1,0 +1,17 @@
+{
+  "hokkaido": {
+    "x": 63.4,
+    "y": 20.4,
+    "label": "Sapporo, Hokkaido"
+  },
+  "honshu-central": {
+    "x": 56.9,
+    "y": 64,
+    "label": "Nerima, Tokyo"
+  },
+  "honshu-south": {
+    "x": 53,
+    "y": 70.3,
+    "label": "Shizuoka City, Shizuoka"
+  }
+}

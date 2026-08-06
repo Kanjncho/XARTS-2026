@@ -1,0 +1,354 @@
+/* ============================================================
+   A Map of Belonging — Homepage styles
+   Calm, playful, minimal, hand-drawn feel.
+   Expand with page-specific sections (e.g. .page--story) later.
+   ============================================================ */
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* Matches the opaque white in sea-monster-wave.png so the wave blends in */
+  --color-bg: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-roof: #c62828;
+  --color-muted: #9e9e9e;
+  --color-map: #8ac75a;
+
+  --font-display: "Georgia", "Times New Roman", serif;
+  --font-body: "Georgia", "Times New Roman", serif;
+
+  --header-height: clamp(4.5rem, 12vw, 7rem);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --house-scale-hover: 1.5;
+
+  /* Creature motion timings — tweak freely */
+  --ufo-duration: 6s;
+  --sea-monster-duration: 5.5s;
+}
+
+/* ---------- Reset / base ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  /* Flat #fff — same white as sea-monster-wave.png fill */
+  background: var(--color-bg);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Page shell ---------- */
+.page--home {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.logo {
+  display: block;
+  width: clamp(9rem, 22vw, 14rem);
+  transition: opacity 0.25s var(--ease-soft);
+}
+
+.logo:hover {
+  opacity: 0.75;
+}
+
+.logo__img {
+  width: 100%;
+  height: auto;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  padding-top: 0.25rem;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  /* ~2× previous size; alignment, gap, and hover unchanged */
+  width: clamp(4.5rem, 10vw, 5.5rem);
+  height: clamp(4.5rem, 10vw, 5.5rem);
+  border-radius: 50%;
+  transition: transform 0.25s var(--ease-soft), opacity 0.25s var(--ease-soft);
+}
+
+.icon-btn:hover {
+  transform: scale(1.08);
+  opacity: 0.7;
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+.icon-btn__img {
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- Map stage ---------- */
+.map-stage {
+  --map-max-h: calc(100dvh - var(--header-height) - 2rem);
+  position: relative;
+  flex: 1;
+  /* Width tracks the map box; height-capped so aspect never letterboxes */
+  width: min(100%, 1080px, calc(var(--map-max-h) * 3 / 2));
+  margin: 0 auto;
+  /* Gentle entrance */
+  animation: stage-fade-in 1.1s var(--ease-soft) both;
+}
+
+@keyframes stage-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Japan map (positioning context for houses) ---------- */
+.japan-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+}
+
+/* Green fill — mask fills this box exactly (same aspect as japan.png) */
+.japan-map::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-map);
+  -webkit-mask-image: url("maps/japan.png");
+  mask-image: url("maps/japan.png");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  pointer-events: none;
+  z-index: 0;
+  animation: map-settle 1.4s var(--ease-soft) both;
+}
+
+.japan-map__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  /* Hidden visually; ::before provides the green silhouette.
+     Kept in the DOM for accessibility (alt text) and intrinsic ratio. */
+  opacity: 0;
+}
+
+@keyframes map-settle {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- Houses — % of .japan-map, not the viewport ---------- */
+.house {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  width: clamp(2.625rem, 6.75vw, 3.9rem);
+  z-index: 10;
+  /* Smooth scale on hover — transform includes centering translate */
+  transition: transform 0.35s var(--ease-soft);
+  will-change: transform;
+}
+
+.house__img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.08));
+}
+
+.house:hover,
+.house:focus-visible {
+  transform: translate(-50%, -50%) scale(var(--house-scale-hover));
+  z-index: 15;
+}
+
+.house:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ---------- Creatures (shared) ---------- */
+.creature {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.creature__img {
+  width: 100%;
+  height: auto;
+}
+
+/* ---- UFO: float gently left ↔ right ---- */
+.creature--ufo {
+  top: 36%;
+  right: 0%;
+  width: clamp(5.25rem, 15vw, 8.25rem);
+  animation: ufo-float var(--ufo-duration) ease-in-out infinite;
+}
+
+@keyframes ufo-float {
+  0%,
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(-12px) translateY(-3px);
+  }
+  50% {
+    transform: translateX(10px) translateY(2px);
+  }
+  75% {
+    transform: translateX(-5px) translateY(-2px);
+  }
+}
+
+/* ---- Sea Monster (Umibozu): body peeks behind a fixed wave ---- */
+.creature--sea-monster {
+  bottom: 0%;
+  left: 42%;
+  width: clamp(6rem, 18vw, 9.75rem);
+  transform: translateX(-50%);
+}
+
+.sea-monster__stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Body sits behind the wave and slowly rises / sinks */
+.sea-monster__body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  will-change: transform;
+  animation: sea-monster-peek var(--sea-monster-duration) ease-in-out infinite;
+}
+
+/* Wave stays fixed in front — lower body remains hidden behind it */
+.sea-monster__wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 100%;
+}
+
+@keyframes sea-monster-peek {
+  0%,
+  100% {
+    transform: translateY(32%);
+  }
+  50% {
+    transform: translateY(6%);
+  }
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 600px) {
+  .page--home {
+    padding: 0.6rem;
+  }
+
+  .logo {
+    width: clamp(7.5rem, 42vw, 11rem);
+  }
+
+  .map-stage {
+    width: min(100%, calc(var(--map-max-h) * 3 / 2));
+  }
+
+  .creature--ufo {
+    right: 0;
+    top: 36%;
+  }
+}
+
+@media (min-width: 900px) {
+  .map-stage {
+    width: min(100%, 1170px, calc(var(--map-max-h) * 3 / 2));
+  }
+}
+
+/* ---------- Future hooks ----------
+   .menu-panel { }          — slide-out / overlay navigation
+   .page--story { }         — individual story layouts
+   .photo-viewer { }        — full-bleed photograph viewer
+   .audio-caption { }       — field-recording captions
+   ------------------------------------------------------------ */

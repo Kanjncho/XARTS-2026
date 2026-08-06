@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Map of Belonging</title>
+  <meta name="description" content="An interactive art experience told through photographs, field recordings, and maps." />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css?v=8" />
+</head>
+<body>
+
+  <!-- ============================================================
+       HOMEPAGE — A Map of Belonging
+       Future pages (story, gallery, about) can live as sibling
+       HTML files or nested routes. Keep shared chrome (header,
+       audio) reusable when expanding.
+       ============================================================ -->
+
+  <div class="page page--home">
+
+    <!-- ------------------------------------------------------------
+         HEADER
+         Logo (top-left) + audio toggle + menu (top-right)
+         Menu panel / navigation is intentionally not built yet.
+         ------------------------------------------------------------ -->
+    <header class="site-header">
+      <a class="logo" href="index.html" aria-label="A Map of Belonging — home">
+        <img src="images/ui/logo.png" alt="A Map of Belonging" class="logo__img" />
+      </a>
+
+      <div class="header-controls">
+        <!-- Speaker: toggles mute / unmute (see script.js) -->
+        <button
+          type="button"
+          class="icon-btn"
+          id="speaker-btn"
+          aria-label="Toggle background music"
+          aria-pressed="false"
+          data-muted="true"
+        >
+          <!-- Starts muted; JS swaps between speaker.png and speaker-muted.png. -->
+          <img
+            src="images/ui/speaker-muted.png"
+            alt=""
+            class="icon-btn__img"
+            id="speaker-icon"
+            width="72"
+            height="72"
+          />
+        </button>
+
+        <!-- Hamburger menu — open/close UI comes later -->
+        <button
+          type="button"
+          class="icon-btn"
+          id="menu-btn"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <img
+            src="images/ui/menu.png"
+            alt=""
+            class="icon-btn__img"
+            width="72"
+            height="56"
+          />
+        </button>
+      </div>
+    </header>
+
+    <!-- ------------------------------------------------------------
+         MAP STAGE
+         Outer frame for the composition. The Japan map lives in
+         .japan-map; house % coordinates are relative to that box
+         (the map image), so they stay pinned on resize.
+         ------------------------------------------------------------ -->
+    <main class="map-stage" id="map-stage" aria-label="Interactive map of Japan">
+
+      <div class="japan-map">
+        <!-- Sizing + a11y image; green fill is painted via CSS mask on .japan-map -->
+        <img
+          src="maps/japan.png"
+          alt="Hand-drawn map of Japan"
+          class="japan-map__img"
+          draggable="false"
+          width="1536"
+          height="1024"
+        />
+
+        <!-- ========== HOUSES — % of .japan-map (the map image box) ==========
+             data-story-id will map each house to a story page later.
+             Do not wire navigation yet. -->
+        <button
+          type="button"
+          class="house"
+          data-story-id="hokkaido"
+          style="--x: 63.4%; --y: 20.4%;"
+          aria-label="Story location: Sapporo, Hokkaido"
+        >
+          <img src="images/houses/home-icon.png" alt="" class="house__img" draggable="false" />
+        </button>
+
+        <button
+          type="button"
+          class="house"
+          data-story-id="honshu-central"
+          style="--x: 56.9%; --y: 64%;"
+          aria-label="Story location: Nerima, Tokyo"
+        >
+          <img src="images/houses/home-icon.png" alt="" class="house__img" draggable="false" />
+        </button>
+
+        <button
+          type="button"
+          class="house"
+          data-story-id="honshu-south"
+          style="--x: 53%; --y: 70.3%;"
+          aria-label="Story location: Shizuoka City, Shizuoka"
+        >
+          <img src="images/houses/home-icon.png" alt="" class="house__img" draggable="false" />
+        </button>
+      </div>
+
+      <!-- ========== CREATURES (positioned on the map stage) ========== -->
+
+      <!-- UFO — gentle left/right float (CSS animation) -->
+      <div class="creature creature--ufo" aria-hidden="true">
+        <img src="images/creatures/ufo.png" alt="" class="creature__img" draggable="false" />
+      </div>
+
+      <!-- Sea Monster (Umibozu)
+           Layer order: body (back) → wave (front, fixed).
+           Body slowly rises / sinks so it peeks from behind the wave. -->
+      <div class="creature creature--sea-monster" aria-hidden="true">
+        <div class="sea-monster__stage">
+          <img
+            src="images/creatures/sea-monster-body.png"
+            alt=""
+            class="creature__img sea-monster__body"
+            draggable="false"
+          />
+          <img
+            src="images/creatures/sea-monster-wave.png"
+            alt=""
+            class="creature__img sea-monster__wave"
+            draggable="false"
+          />
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Background music — loops when unmuted.
+       Drop a file at audio/ambient.mp3 (or .ogg) and update the src below.
+       Starts muted until the visitor taps the speaker (browser autoplay policy). -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="audio/ambient.mp3" type="audio/mpeg" />
+    <source src="audio/ambient.ogg" type="audio/ogg" />
+  </audio>
+
+  <script src="script.js?v=8" defer></script>
+</body>
+</html>
