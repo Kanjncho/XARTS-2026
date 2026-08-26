@@ -1,0 +1,27 @@
+{
+  "empty-lot": {
+    "x": 11.9,
+    "y": 24.9,
+    "size": 220
+  },
+  "tokiwagi-park": {
+    "x": 25.9,
+    "y": 35,
+    "size": 200
+  },
+  "three-story-house": {
+    "x": 36.6,
+    "y": 16.9,
+    "size": 130
+  },
+  "first-house": {
+    "x": 85.9,
+    "y": 16.9,
+    "size": 130
+  },
+  "misono-nursery": {
+    "x": 63.2,
+    "y": 74.1,
+    "size": 155
+  }
+}

@@ -6,7 +6,6 @@
 
 /* ---------- Design tokens ---------- */
 :root {
-  /* Matches the opaque white in sea-monster-wave.png so the wave blends in */
   --color-bg: #ffffff;
   --color-ink: #1a1a1a;
   --color-roof: #c62828;
@@ -19,10 +18,6 @@
   --header-height: clamp(4.5rem, 12vw, 7rem);
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
   --house-scale-hover: 1.5;
-
-  /* Creature motion timings — tweak freely */
-  --ufo-duration: 6s;
-  --sea-monster-duration: 5.5s;
 }
 
 /* ---------- Reset / base ---------- */
@@ -42,7 +37,6 @@ body {
 body {
   font-family: var(--font-body);
   color: var(--color-ink);
-  /* Flat #fff — same white as sea-monster-wave.png fill */
   background: var(--color-bg);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -89,7 +83,8 @@ button {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  z-index: 20;
+  position: relative;
+  z-index: 50;
   flex-shrink: 0;
 }
 
@@ -112,7 +107,12 @@ button {
   display: flex;
   align-items: center;
   gap: clamp(0.75rem, 2vw, 1.25rem);
-  padding-top: 0.25rem;
+  /* Vertically center icons with the visual center of "of" in the logo */
+  padding-top: calc(
+    clamp(9rem, 22vw, 14rem) * 0.27643
+    - clamp(4.5rem, 10vw, 5.5rem) / 2
+    + 10px
+  );
 }
 
 .icon-btn {
@@ -138,6 +138,79 @@ button {
 .icon-btn__img {
   width: 100%;
   height: auto;
+}
+
+/* ---------- Site menu (hamburger panel) ---------- */
+.site-menu[hidden] {
+  display: none !important;
+}
+
+.site-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: #ffffff;
+  padding:
+    clamp(5.5rem, 16vw, 8rem)
+    clamp(1.5rem, 5vw, 3rem)
+    clamp(2rem, 5vw, 3rem);
+  overflow: hidden;
+}
+
+.site-menu__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(1.35rem, 4vw, 2.15rem);
+  max-width: 28rem;
+  margin-top: 2.86cm;
+  /* Align menu text with visible left edge of logo artwork (227px inset in 1396px PNG) */
+  margin-left: calc(
+    clamp(0.75rem, 2vw, 1.5rem)
+    + clamp(9rem, 22vw, 14rem) * 0.162607
+    - clamp(1.5rem, 5vw, 3rem)
+  );
+}
+
+.site-menu__item {
+  display: block;
+  width: 100%;
+  padding: 0.2rem 0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: clamp(1.2rem, 3.2vw, 1.65rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: #000000;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s var(--ease-soft);
+}
+
+.site-menu__item:hover {
+  opacity: 0.55;
+}
+
+.site-menu__item:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}
+
+/* Keep header + menu locked to the viewport while the menu is open */
+body.is-menu-open {
+  overflow: hidden;
+}
+
+body.is-menu-open .site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background: #ffffff;
 }
 
 /* ---------- Map stage ---------- */
@@ -168,6 +241,11 @@ button {
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 2;
+  transform: scale(1.5);
+  transform-origin: center center;
+  /* Center-scale pushes edges outward by 25% of map height; offset to keep top below logo */
+  margin-top: calc(100% / 6);
+  margin-bottom: calc(100% / 6);
 }
 
 /* Green fill — mask fills this box exactly (same aspect as japan.png) */
@@ -241,85 +319,6 @@ button {
   border-radius: 4px;
 }
 
-/* ---------- Creatures (shared) ---------- */
-.creature {
-  position: absolute;
-  z-index: 5;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.creature__img {
-  width: 100%;
-  height: auto;
-}
-
-/* ---- UFO: float gently left ↔ right ---- */
-.creature--ufo {
-  top: 36%;
-  right: 0%;
-  width: clamp(5.25rem, 15vw, 8.25rem);
-  animation: ufo-float var(--ufo-duration) ease-in-out infinite;
-}
-
-@keyframes ufo-float {
-  0%,
-  100% {
-    transform: translateX(0) translateY(0);
-  }
-  25% {
-    transform: translateX(-12px) translateY(-3px);
-  }
-  50% {
-    transform: translateX(10px) translateY(2px);
-  }
-  75% {
-    transform: translateX(-5px) translateY(-2px);
-  }
-}
-
-/* ---- Sea Monster (Umibozu): body peeks behind a fixed wave ---- */
-.creature--sea-monster {
-  bottom: 0%;
-  left: 42%;
-  width: clamp(6rem, 18vw, 9.75rem);
-  transform: translateX(-50%);
-}
-
-.sea-monster__stage {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* Body sits behind the wave and slowly rises / sinks */
-.sea-monster__body {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  will-change: transform;
-  animation: sea-monster-peek var(--sea-monster-duration) ease-in-out infinite;
-}
-
-/* Wave stays fixed in front — lower body remains hidden behind it */
-.sea-monster__wave {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: 2;
-  width: 100%;
-}
-
-@keyframes sea-monster-peek {
-  0%,
-  100% {
-    transform: translateY(32%);
-  }
-  50% {
-    transform: translateY(6%);
-  }
-}
-
 /* ---------- Responsive tweaks ---------- */
 @media (max-width: 600px) {
   .page--home {
@@ -333,11 +332,6 @@ button {
   .map-stage {
     width: min(100%, calc(var(--map-max-h) * 3 / 2));
   }
-
-  .creature--ufo {
-    right: 0;
-    top: 36%;
-  }
 }
 
 @media (min-width: 900px) {
@@ -346,8 +340,470 @@ button {
   }
 }
 
+/* ---------- Regional map view ---------- */
+.regional-view[hidden] {
+  display: none !important;
+}
+
+.regional-view {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.regional-view__back {
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+  /* Align visual left edge of arrow art with visual left edge of logo art */
+  margin-left: calc(
+    clamp(9rem, 22vw, 14rem) * 0.162607
+    - 0.15rem
+    - clamp(3.25rem, 8vw, 4.75rem) * 0.27734375
+  );
+  padding: 0.25rem 0.15rem;
+  border: none;
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: opacity 0.25s var(--ease-soft);
+}
+
+.regional-view__back-img {
+  width: clamp(3.25rem, 8vw, 4.75rem);
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+.regional-view__back:hover {
+  opacity: 0.7;
+}
+
+.regional-view__back:focus,
+.regional-view__back:active,
+.regional-view__back:focus-visible {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.regional-view__stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Shrink-wraps the PNG so future icons can use % of the map itself */
+.regional-map {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.regional-map__base {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(100%, calc(100dvh - var(--header-height) - 5.5rem));
+  object-fit: contain;
+}
+
+/* Location icons overlay — % positions match the base map image box */
+.regional-map__places {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Location icons — same positioning / hover pattern as .house.
+   Size via CSS width (not transform scale) so PNGs rasterize at final size. */
+.place {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  --place-size: 100;
+  --place-scale: calc(var(--place-size) / 100);
+  width: calc(clamp(2.5rem, 11vw, 4.5rem) * var(--place-scale));
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: auto;
+  transition: transform 0.35s var(--ease-soft);
+  will-change: transform;
+}
+
+.place__img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.08));
+}
+
+.place:hover,
+.place:focus-visible {
+  transform: translate(-50%, -50%) scale(var(--house-scale-hover));
+  z-index: 15;
+}
+
+.place:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+body.is-regional-view .map-stage,
+body.is-concept-view .map-stage {
+  display: none;
+}
+
+/* ---------- Concept view ---------- */
+.concept-view[hidden] {
+  display: none !important;
+}
+
+.concept-view {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #000000;
+  overflow-y: auto;
+}
+
+.concept-view__back {
+  align-self: flex-start;
+  flex-shrink: 0;
+  /* ~0.8cm from arrow image bottom to heading (accounts for 0.25rem button padding) */
+  margin-bottom: calc(0.8cm - 0.25rem);
+  /* Same visual left alignment as regional back / logo artwork */
+  margin-left: calc(
+    clamp(9rem, 22vw, 14rem) * 0.162607
+    - 0.15rem
+    - clamp(3.25rem, 8vw, 4.75rem) * 0.27734375
+  );
+  padding: 0.25rem 0.15rem;
+  border: none;
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: opacity 0.25s var(--ease-soft);
+}
+
+.concept-view__back-img {
+  width: clamp(3.25rem, 8vw, 4.75rem);
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+.concept-view__back:hover {
+  opacity: 0.7;
+}
+
+.concept-view__back:focus,
+.concept-view__back:active,
+.concept-view__back:focus-visible {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.concept-view__content {
+  flex: 1;
+  /* Left: visual logo artwork edge; right: hamburger icon outer edge */
+  margin-left: calc(clamp(9rem, 22vw, 14rem) * 0.162607);
+  margin-right: 0;
+  padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: clamp(0.95rem, 1.7vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+.concept-view__heading {
+  margin: 0 0 1.35em;
+  font-size: 1.6em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.concept-view__heading strong {
+  font-weight: 700;
+}
+
+.concept-view__content p {
+  margin: 0 0 1.15em;
+  font-weight: 400;
+}
+
+.concept-view__content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Photo viewer — overlay within regional map view */
+.photo-view {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.photo-view[hidden] {
+  display: none !important;
+}
+
+/* While a photo is open, keep the regional map fully covered */
+.regional-view:has(.photo-view:not([hidden])) > .regional-view__back,
+.regional-view:has(.photo-view:not([hidden])) > .regional-view__stage {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.photo-view__back {
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+  /* Align visual left edge of arrow art with visual left edge of logo art */
+  margin-left: calc(
+    clamp(9rem, 22vw, 14rem) * 0.162607
+    - 0.15rem
+    - clamp(3.25rem, 8vw, 4.75rem) * 0.27734375
+  );
+  padding: 0.25rem 0.15rem;
+  transition: opacity 0.25s var(--ease-soft);
+}
+
+.photo-view__back-img {
+  width: clamp(3.25rem, 8vw, 4.75rem);
+  height: auto;
+}
+
+.photo-view__back:hover {
+  opacity: 0.7;
+}
+
+.photo-view__back:focus,
+.photo-view__back:focus-visible {
+  outline: none;
+}
+
+.photo-view__stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-view__img {
+  display: block;
+  max-width: 100%;
+  max-height: min(100%, calc(100dvh - var(--header-height) - 8rem));
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.photo-view__audio {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--color-ink);
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  line-height: 1.3;
+}
+
+.photo-view__audio[hidden] {
+  display: none !important;
+}
+
+.photo-view__audio-indicator {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--color-ink);
+  flex-shrink: 0;
+}
+
+.photo-view__audio.is-playing .photo-view__audio-indicator {
+  animation: photo-audio-pulse 1.2s var(--ease-soft) infinite;
+}
+
+@keyframes photo-audio-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+}
+
+.photo-view__audio-label {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- Welcome overlay ---------- */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: rgba(255, 255, 255, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s var(--ease-soft);
+}
+
+body.is-welcome-open {
+  overflow: hidden;
+}
+
+body.is-welcome-open .page--home {
+  filter: blur(5px);
+  transition: filter 0.45s var(--ease-soft);
+}
+
+body.is-welcome-open .welcome-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.is-welcome-closing .page--home {
+  filter: none;
+  transition: filter 0.4s var(--ease-soft);
+}
+
+body.is-welcome-closing .welcome-overlay {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-soft);
+}
+
+.welcome-dialog {
+  width: min(100%, 42rem);
+  padding: clamp(1.5rem, 4vw, 2.25rem) clamp(1.35rem, 4vw, 2rem);
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #000000;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.5s var(--ease-soft),
+    transform 0.5s var(--ease-soft);
+}
+
+body.is-welcome-open .welcome-dialog {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body.is-welcome-closing .welcome-dialog {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.35s var(--ease-soft),
+    transform 0.35s var(--ease-soft);
+}
+
+.welcome-dialog__copy {
+  margin: 0 0 clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.welcome-dialog__text {
+  margin: 0;
+  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+.welcome-dialog__text + .welcome-dialog__text {
+  margin-top: 0.85em;
+}
+
+.welcome-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.65rem, 2vw, 1rem);
+}
+
+.welcome-dialog__btn {
+  flex: 1 1 10rem;
+  max-width: 14rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid #000000;
+  background: #ffffff;
+  color: #000000;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  font-weight: 400;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: opacity 0.2s var(--ease-soft), background-color 0.2s var(--ease-soft);
+}
+
+.welcome-dialog__btn:hover {
+  background-color: #f5f5f5;
+}
+
+.welcome-dialog__btn:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-overlay,
+  .welcome-dialog,
+  body.is-welcome-open .page--home,
+  body.is-welcome-closing .page--home {
+    transition: none !important;
+  }
+
+  .welcome-dialog {
+    transform: none;
+  }
+}
+
 /* ---------- Future hooks ----------
-   .menu-panel { }          — slide-out / overlay navigation
    .page--story { }         — individual story layouts
    .photo-viewer { }        — full-bleed photograph viewer
    .audio-caption { }       — field-recording captions

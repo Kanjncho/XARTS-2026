@@ -7,7 +7,7 @@
   <meta name="description" content="An interactive art experience told through photographs, field recordings, and maps." />
 
   <!-- Styles -->
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=40" />
 </head>
 <body>
 
@@ -23,7 +23,6 @@
     <!-- ------------------------------------------------------------
          HEADER
          Logo (top-left) + audio toggle + menu (top-right)
-         Menu panel / navigation is intentionally not built yet.
          ------------------------------------------------------------ -->
     <header class="site-header">
       <a class="logo" href="index.html" aria-label="A Map of Belonging — home">
@@ -51,13 +50,14 @@
           />
         </button>
 
-        <!-- Hamburger menu — open/close UI comes later -->
+        <!-- Hamburger menu — toggles #site-menu open/closed -->
         <button
           type="button"
           class="icon-btn"
           id="menu-btn"
           aria-label="Open menu"
           aria-expanded="false"
+          aria-controls="site-menu"
         >
           <img
             src="images/ui/menu.png"
@@ -69,6 +69,37 @@
         </button>
       </div>
     </header>
+
+    <!-- Navigation menu -->
+    <nav
+      id="site-menu"
+      class="site-menu"
+      hidden
+      aria-label="Site menu"
+    >
+      <ul class="site-menu__list">
+        <li>
+          <button type="button" class="site-menu__item" data-menu="hokkaido">
+            Hokkaido
+          </button>
+        </li>
+        <li>
+          <button type="button" class="site-menu__item" data-menu="shizuoka">
+            Shizuoka
+          </button>
+        </li>
+        <li>
+          <button type="button" class="site-menu__item" data-menu="tokyo">
+            Tokyo
+          </button>
+        </li>
+        <li>
+          <button type="button" class="site-menu__item" data-menu="concept">
+            Concept
+          </button>
+        </li>
+      </ul>
+    </nav>
 
     <!-- ------------------------------------------------------------
          MAP STAGE
@@ -90,8 +121,7 @@
         />
 
         <!-- ========== HOUSES — % of .japan-map (the map image box) ==========
-             data-story-id will map each house to a story page later.
-             Do not wire navigation yet. -->
+             data-story-id opens the matching regional map (see script.js). -->
         <button
           type="button"
           class="house"
@@ -123,45 +153,146 @@
         </button>
       </div>
 
-      <!-- ========== CREATURES (positioned on the map stage) ========== -->
+    </main>
 
-      <!-- UFO — gentle left/right float (CSS animation) -->
-      <div class="creature creature--ufo" aria-hidden="true">
-        <img src="images/creatures/ufo.png" alt="" class="creature__img" draggable="false" />
-      </div>
+    <!-- ------------------------------------------------------------
+         REGIONAL MAP VIEW
+         Shown when a house is clicked. Base PNG fills .regional-map;
+         future location icons (houses, schools, parks) should be
+         children of .regional-map, positioned with --x / --y %.
+         ------------------------------------------------------------ -->
+    <section
+      class="regional-view"
+      id="regional-view"
+      hidden
+      aria-label="Regional map"
+    >
+      <button type="button" class="regional-view__back" id="regional-back">
+        <img
+          src="images/ui/arrow.png"
+          alt="Back to Japan map"
+          class="regional-view__back-img"
+          draggable="false"
+        />
+      </button>
 
-      <!-- Sea Monster (Umibozu)
-           Layer order: body (back) → wave (front, fixed).
-           Body slowly rises / sinks so it peeks from behind the wave. -->
-      <div class="creature creature--sea-monster" aria-hidden="true">
-        <div class="sea-monster__stage">
+      <div class="regional-view__stage">
+        <div class="regional-map" id="regional-map">
           <img
-            src="images/creatures/sea-monster-body.png"
             alt=""
-            class="creature__img sea-monster__body"
+            class="regional-map__base"
+            id="regional-base"
             draggable="false"
           />
-          <img
-            src="images/creatures/sea-monster-wave.png"
-            alt=""
-            class="creature__img sea-monster__wave"
-            draggable="false"
-          />
+          <!-- Location icons (injected by script.js per region) -->
+          <div class="regional-map__places" id="regional-places"></div>
         </div>
       </div>
 
-    </main>
+      <!-- Photo viewer — shown when a location icon is clicked -->
+      <section
+        class="photo-view"
+        id="photo-view"
+        hidden
+        aria-label="Photograph"
+      >
+        <button type="button" class="photo-view__back" id="photo-back">
+          <img
+            src="images/ui/arrow.png"
+            alt="Back to regional map"
+            class="photo-view__back-img"
+            draggable="false"
+          />
+        </button>
+        <div class="photo-view__stage">
+          <img
+            alt=""
+            class="photo-view__img"
+            id="photo-view-img"
+            draggable="false"
+          />
+        </div>
+        <div class="photo-view__audio" id="photo-audio-status" hidden>
+          <span class="photo-view__audio-indicator" aria-hidden="true"></span>
+          <span class="photo-view__audio-label" id="photo-audio-label"></span>
+        </div>
+      </section>
+    </section>
+
+    <!-- ------------------------------------------------------------
+         CONCEPT VIEW
+         Opened from the hamburger menu. Same chrome / back pattern
+         as the regional map view.
+         ------------------------------------------------------------ -->
+    <section
+      class="concept-view"
+      id="concept-view"
+      hidden
+      aria-label="Concept"
+    >
+      <button type="button" class="concept-view__back" id="concept-back">
+        <img
+          src="images/ui/arrow.png"
+          alt="Back to Japan map"
+          class="concept-view__back-img"
+          draggable="false"
+        />
+      </button>
+
+      <div class="concept-view__content">
+        <p class="concept-view__heading"><strong>concept</strong></p>
+        <p>
+          This project challenges that premise by presenting the perspective that belonging is not a fixed concept, but something that can be expanded, much like creating one’s own personal world map.
+        </p>
+        <p>
+          In today’s society, where mobility is becoming increasingly common, mainstream narratives often frame “mobility” as “exile,” suggesting that to belong to one place, one must leave another behind. This is a mindset that treats one’s hometown as something to be overwritten—much like registering a new address when moving.
+        </p>
+        <p>
+          I have moved many times within Japan—from Hokkaido to Shizuoka, Tokyo, and Chiba—yet I do not feel that my sense of “home” has shifted from place to place. Rather, each of these places remains within me, forming a “sense of belonging” that coexists within my identity.
+        </p>
+        <p>
+          I believe that for many people—not just international students, immigrants, or those who move frequently—identity is not rooted in a single place of origin, but is formed through multiple regions and the memories and cultures associated with them. For example, even a place one once visited merely as a tourist holds personal memories and is a special place for each individual. When one returns there years later, everyone is likely to reflect on their past self and those memories. Isn’t this relationship between a place and a person also a form of belonging?
+        </p>
+      </div>
+    </section>
 
   </div>
 
-  <!-- Background music — loops when unmuted.
-       Drop a file at audio/ambient.mp3 (or .ogg) and update the src below.
-       Starts muted until the visitor taps the speaker (browser autoplay policy). -->
-  <audio id="bg-music" loop preload="auto">
-    <source src="audio/ambient.mp3" type="audio/mpeg" />
-    <source src="audio/ambient.ogg" type="audio/ogg" />
-  </audio>
+  <!-- Welcome / audio choice dialog — shown on first load -->
+  <div
+    id="welcome-overlay"
+    class="welcome-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="welcome-text"
+  >
+    <div class="welcome-dialog">
+      <div id="welcome-text" class="welcome-dialog__copy">
+        <p class="welcome-dialog__text">
+          This website is designed to be enjoyed through both sight and sound.
+        </p>
+        <p class="welcome-dialog__text">
+          Click the speaker icon and experience the website with sound.
+        </p>
+      </div>
+      <div class="welcome-dialog__actions">
+        <button type="button" class="welcome-dialog__btn" id="welcome-sound-on">
+          Turn sound on
+        </button>
+        <button type="button" class="welcome-dialog__btn" id="welcome-sound-off">
+          Continue without sound
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <script src="script.js?v=8" defer></script>
+  <!-- Background music — loops when unmuted.
+       Starts muted until the visitor taps the speaker (browser autoplay policy). -->
+  <audio id="bg-music" loop preload="auto" src="audio/bg-music.wav?v=2"></audio>
+
+  <!-- Field recordings — separate from homepage background music -->
+  <audio id="field-recording" preload="auto"></audio>
+
+  <script src="script.js?v=33" defer></script>
 </body>
 </html>

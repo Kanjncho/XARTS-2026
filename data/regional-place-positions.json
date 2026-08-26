@@ -1,0 +1,83 @@
+{
+  "hokkaido": {
+    "empty-lot": {
+      "x": 11.9,
+      "y": 24.9,
+      "size": 220
+    },
+    "tokiwagi-park": {
+      "x": 25.9,
+      "y": 35,
+      "size": 200
+    },
+    "three-story-house": {
+      "x": 36.6,
+      "y": 16.9,
+      "size": 130
+    },
+    "first-house": {
+      "x": 85.9,
+      "y": 16.9,
+      "size": 130
+    },
+    "misono-nursery": {
+      "x": 63.2,
+      "y": 74.1,
+      "size": 155
+    }
+  },
+  "shizuoka": {
+    "senauchitsubo-park": {
+      "x": 14,
+      "y": 23.9,
+      "size": 240
+    },
+    "river-in-front-of-my-apartment": {
+      "x": 37.1,
+      "y": 87,
+      "size": 190
+    },
+    "casa-grande": {
+      "x": 42.1,
+      "y": 46.7,
+      "size": 225
+    },
+    "s-pulse-dream-plaza": {
+      "x": 85.4,
+      "y": 24.4,
+      "size": 255
+    },
+    "miho-no-matsubara": {
+      "x": 84.3,
+      "y": 69.4,
+      "size": 255
+    }
+  },
+  "tokyo": {
+    "ima-hall": {
+      "x": 22,
+      "y": 22,
+      "size": 150
+    },
+    "after-school-center": {
+      "x": 50,
+      "y": 12,
+      "size": 150
+    },
+    "elementary-school": {
+      "x": 55,
+      "y": 55,
+      "size": 160
+    },
+    "fresco-hikarigaoka": {
+      "x": 71.9,
+      "y": 78.5,
+      "size": 150
+    },
+    "ecc-junior": {
+      "x": 75.6,
+      "y": 96.1,
+      "size": 140
+    }
+  }
+}
