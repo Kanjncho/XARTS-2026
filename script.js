@@ -158,7 +158,7 @@
         y: 96.1,
         size: 140,
         label: "ECC Junior (English class)",
-        photo: "photos/Tokyo-pics/ECC-Junior.JPG",
+        photo: "photos/Tokyo-pics/ECC-junior.jpg",
         audio: "audio/Tokyo-audio/ECC-Junior.aac",
       },
     ],
