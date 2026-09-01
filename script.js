@@ -217,6 +217,50 @@
     ],
   };
 
+  /* Temporary film-photo test — set to false to restore digital photos. */
+  const USE_FILM_PHOTOS = true;
+
+  const FILM_PHOTO_OVERRIDES = {
+    /* Hokkaido */
+    "photos/Hokkaido-pics/Empty-lot copy.JPG":
+      "photos/Hokkaido-pics/Hokkaido-film/Empty-lot copy.jpg",
+    "photos/Hokkaido-pics/Tokiwagi-park copy.JPG":
+      "photos/Hokkaido-pics/Hokkaido-film/Tokiwagi-park copy.jpg",
+    "photos/Hokkaido-pics/3-story-house copy.JPG":
+      "photos/Hokkaido-pics/Hokkaido-film/3-story-house copy.jpg",
+    "photos/Hokkaido-pics/The-first-house copy.JPG":
+      "photos/Hokkaido-pics/Hokkaido-film/The-first-house copy.jpg",
+    "photos/Hokkaido-pics/Misono-Nurserycopy.jpg":
+      "photos/Hokkaido-pics/Hokkaido-film/Misono-Nurserycopy.jpg",
+    /* Tokyo */
+    "photos/Tokyo-pics/IMA-Hall.jpg":
+      "photos/Tokyo-pics/Tokyo-film/IMA-Hall-film.jpg",
+    "photos/Tokyo-pics/After-school-center.JPG":
+      "photos/Tokyo-pics/Tokyo-film/After-school-center-film.jpg",
+    "photos/Tokyo-pics/Elementary-School.jpg":
+      "photos/Tokyo-pics/Tokyo-film/Elementary-School-film.jpg",
+    "photos/Tokyo-pics/Fresco-Hikarigaoka.JPG":
+      "photos/Tokyo-pics/Tokyo-film/Fresco-Hikarigaoka-film.jpg",
+    "photos/Tokyo-pics/ECC-junior.jpg":
+      "photos/Tokyo-pics/Tokyo-film/ECC-junior-film.jpg",
+    /* Shizuoka */
+    "photos/Shizuoka-pics/Senauchitsubo-park.JPG":
+      "photos/Shizuoka-pics/Shizuoka-film/Senauchitsubo-park.jpg",
+    "photos/Shizuoka-pics/The-river-in -front-of-my-apartment.JPG":
+      "photos/Shizuoka-pics/Shizuoka-film/The-river-in -front-of-my-apartment.jpg",
+    "photos/Shizuoka-pics/Casa-Grande.JPG":
+      "photos/Shizuoka-pics/Shizuoka-film/Casa-Grande.jpg",
+    "photos/Shizuoka-pics/S-pulse-Dream-Plaza.jpg":
+      "photos/Shizuoka-pics/Shizuoka-film/S-pulse-Dream-Plaza.jpg",
+    "photos/Shizuoka-pics/Miho-no-Matsubara.jpg":
+      "photos/Shizuoka-pics/Shizuoka-film/Miho-no-Matsubara.jpg",
+  };
+
+  function getDisplayPhotoPath(photoPath) {
+    if (!USE_FILM_PHOTOS || !photoPath) return photoPath;
+    return FILM_PHOTO_OVERRIDES[photoPath] || photoPath;
+  }
+
   /* ------------------------------------------------------------
      Global audio — speaker controls #bg-music and #field-recording
      MUTE: pause and preserve position.
@@ -723,7 +767,7 @@
   function showPhoto(place) {
     if (!place || !place.photo || !photoView || !photoViewImg) return;
 
-    photoViewImg.src = place.photo;
+    photoViewImg.src = getDisplayPhotoPath(place.photo);
     photoViewImg.alt = place.label;
     photoView.hidden = false;
     if (photoBack) photoBack.focus();
