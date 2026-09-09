@@ -75,6 +75,34 @@ button {
   display: flex;
   flex-direction: column;
   padding: clamp(0.75rem, 2vw, 1.5rem);
+  /* Shared header metrics — photo viewer locks to these UI anchors */
+  --logo-width: clamp(9rem, 22vw, 14rem);
+  --icon-size: clamp(4.5rem, 10vw, 5.5rem);
+  --header-controls-gap: clamp(0.75rem, 2vw, 1.25rem);
+  /* 991/1396 = right edge of "P" in logo "MAP" */
+  --logo-p-right-frac: 0.709885;
+  /* 694/1557 = right edge of muted speaker cone (excludes the X) */
+  --speaker-cone-right-frac: 0.445729;
+  /* Shared back-arrow metrics (regional map + photo viewer) */
+  --back-arrow-size: clamp(3.25rem, 8vw, 4.75rem);
+  --back-arrow-margin-left: calc(
+    clamp(9rem, 22vw, 14rem) * 0.162607
+    - 0.15rem
+    - var(--back-arrow-size) * 0.27734375
+  );
+  /* Photo-viewer reference: visual ink top aligned with photograph top */
+  --back-arrow-top: calc(
+    var(--back-arrow-size) * (1024 / 1536) * (1 - 224 / 1024)
+    + 0.25rem
+    + 0.5rem
+  );
+  /* Distance from regional-view left to the back-arrow ink's right edge
+     (arrow button padding-left 0.15rem; ink ends at 1114/1536 of the PNG). */
+  --regional-map-side-inset: calc(
+    var(--back-arrow-margin-left)
+    + 0.15rem
+    + var(--back-arrow-size) * (1114 / 1536)
+  );
 }
 
 /* ---------- Header ---------- */
@@ -90,7 +118,7 @@ button {
 
 .logo {
   display: block;
-  width: clamp(9rem, 22vw, 14rem);
+  width: var(--logo-width);
   transition: opacity 0.25s var(--ease-soft);
 }
 
@@ -106,11 +134,11 @@ button {
 .header-controls {
   display: flex;
   align-items: center;
-  gap: clamp(0.75rem, 2vw, 1.25rem);
+  gap: var(--header-controls-gap);
   /* Vertically center icons with the visual center of "of" in the logo */
   padding-top: calc(
-    clamp(9rem, 22vw, 14rem) * 0.27643
-    - clamp(4.5rem, 10vw, 5.5rem) / 2
+    var(--logo-width) * 0.27643
+    - var(--icon-size) / 2
     + 10px
   );
 }
@@ -119,8 +147,8 @@ button {
   display: grid;
   place-items: center;
   /* ~2× previous size; alignment, gap, and hover unchanged */
-  width: clamp(4.5rem, 10vw, 5.5rem);
-  height: clamp(4.5rem, 10vw, 5.5rem);
+  width: var(--icon-size);
+  height: var(--icon-size);
   border-radius: 50%;
   transition: transform 0.25s var(--ease-soft), opacity 0.25s var(--ease-soft);
 }
@@ -323,10 +351,7 @@ body.is-menu-open .site-header {
 @media (max-width: 600px) {
   .page--home {
     padding: 0.6rem;
-  }
-
-  .logo {
-    width: clamp(7.5rem, 42vw, 11rem);
+    --logo-width: clamp(7.5rem, 42vw, 11rem);
   }
 
   .map-stage {
@@ -358,13 +383,13 @@ body.is-menu-open .site-header {
   align-self: flex-start;
   flex-shrink: 0;
   margin-bottom: 0.5rem;
-  /* Align visual left edge of arrow art with visual left edge of logo art */
-  margin-left: calc(
-    clamp(9rem, 22vw, 14rem) * 0.162607
-    - 0.15rem
-    - clamp(3.25rem, 8vw, 4.75rem) * 0.27734375
-  );
+  /* Same horizontal + vertical position as .photo-view__back */
+  margin-left: var(--back-arrow-margin-left);
   padding: 0.25rem 0.15rem;
+  position: relative;
+  top: var(--back-arrow-top);
+  /* Above .regional-map (positioned later in tree) so clicks hit the arrow */
+  z-index: 20;
   border: none;
   background: transparent;
   outline: none;
@@ -375,7 +400,7 @@ body.is-menu-open .site-header {
 }
 
 .regional-view__back-img {
-  width: clamp(3.25rem, 8vw, 4.75rem);
+  width: var(--back-arrow-size);
   height: auto;
   display: block;
   pointer-events: none;
@@ -403,21 +428,23 @@ body.is-menu-open .site-header {
   justify-content: center;
 }
 
-/* Shrink-wraps the PNG so future icons can use % of the map itself */
+/* Shrink-wraps the PNG so location icons use % of the map itself.
+   Width is fixed from the stage center ↔ arrow-right relationship so the
+   map stays centered while its left edge meets the back-arrow ink right. */
 .regional-map {
   position: relative;
-  width: fit-content;
+  width: calc(100% - 2 * var(--regional-map-side-inset));
+  max-width: calc(100% - 2 * var(--regional-map-side-inset));
   height: fit-content;
-  max-width: 100%;
-  max-height: 100%;
+  max-height: none;
 }
 
 .regional-map__base {
   display: block;
-  width: auto;
+  width: 100%;
   height: auto;
   max-width: 100%;
-  max-height: min(100%, calc(100dvh - var(--header-height) - 5.5rem));
+  max-height: none;
   object-fit: contain;
 }
 
@@ -558,47 +585,75 @@ body.is-concept-view .map-stage {
   margin-bottom: 0;
 }
 
-/* Photo viewer — overlay within regional map view */
+/* Photo viewer — in-flow within regional map view (not a fixed viewport window) */
 .photo-view {
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 30;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: auto;
   box-sizing: border-box;
   background-color: #ffffff;
-  overflow: hidden;
+  overflow: visible;
+  /*
+    Photo width spans fixed UI anchors (same in every region / browser):
+    left  = right edge of "P" in logo "MAP"
+    right = right edge of speaker cone only (excludes mute "X")
+  */
+  --photo-left-inset: calc(var(--logo-width) * var(--logo-p-right-frac));
+  --photo-right-inset: calc(
+    var(--icon-size) * (2 - var(--speaker-cone-right-frac))
+    + var(--header-controls-gap)
+  );
 }
 
 .photo-view[hidden] {
   display: none !important;
 }
 
-/* While a photo is open, keep the regional map fully covered */
+/* While a photo is open, remove the map from layout so the photo
+   can grow the page instead of overlaying a fixed viewport box. */
+.regional-view:has(.photo-view:not([hidden])) {
+  flex: 0 0 auto;
+  min-height: auto;
+  height: auto;
+  overflow: visible;
+}
+
 .regional-view:has(.photo-view:not([hidden])) > .regional-view__back,
 .regional-view:has(.photo-view:not([hidden])) > .regional-view__stage {
-  visibility: hidden;
-  pointer-events: none;
+  display: none;
+}
+
+/* Let the document grow with the photo; page scroll reveals the rest. */
+html:has(.photo-view:not([hidden])),
+body:has(.photo-view:not([hidden])) {
+  height: auto;
+  min-height: 100%;
+}
+
+.page--home:has(.photo-view:not([hidden])) {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
 }
 
 .photo-view__back {
   align-self: flex-start;
   flex-shrink: 0;
   margin-bottom: 0.5rem;
-  /* Align visual left edge of arrow art with visual left edge of logo art */
-  margin-left: calc(
-    clamp(9rem, 22vw, 14rem) * 0.162607
-    - 0.15rem
-    - clamp(3.25rem, 8vw, 4.75rem) * 0.27734375
-  );
+  /* Same horizontal + vertical position as .regional-view__back */
+  margin-left: var(--back-arrow-margin-left);
   padding: 0.25rem 0.15rem;
+  position: relative;
+  top: var(--back-arrow-top);
+  z-index: 20;
   transition: opacity 0.25s var(--ease-soft);
 }
 
 .photo-view__back-img {
-  width: clamp(3.25rem, 8vw, 4.75rem);
+  width: var(--back-arrow-size);
   height: auto;
 }
 
@@ -612,20 +667,21 @@ body.is-concept-view .map-stage {
 }
 
 .photo-view__stage {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 0 0 auto;
+  width: auto;
+  margin-left: var(--photo-left-inset);
+  margin-right: var(--photo-right-inset);
+  display: block;
+  overflow: visible;
 }
 
 .photo-view__img {
   display: block;
+  /* Keep the established horizontal width; height follows aspect ratio. */
+  width: 100%;
   max-width: 100%;
-  max-height: min(100%, calc(100dvh - var(--header-height) - 8rem));
-  width: auto;
   height: auto;
+  max-height: none;
   object-fit: contain;
 }
 
