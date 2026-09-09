@@ -536,7 +536,32 @@
   const welcomeOverlay = document.getElementById("welcome-overlay");
   const welcomeSoundOn = document.getElementById("welcome-sound-on");
   const welcomeSoundOff = document.getElementById("welcome-sound-off");
+  const welcomeMessage = document.getElementById("welcome-message");
   const WELCOME_FADE_MS = 420;
+  const WELCOME_TEXT_PHONE =
+    "For the best experience, turn your phone sideways and turn on sound.";
+  const WELCOME_TEXT_DESKTOP =
+    "This website is designed to be enjoyed through both sight and sound.";
+
+  function isSmartphone() {
+    const ua = navigator.userAgent || "";
+    if (/iPhone|iPod/i.test(ua)) return true;
+    if (/Android/i.test(ua) && /Mobile/i.test(ua)) return true;
+    if (/Windows Phone|IEMobile|Opera Mini|webOS|BlackBerry/i.test(ua)) {
+      return true;
+    }
+    /* Fallback for phone-sized coarse pointers without a clear UA match */
+    return window.matchMedia(
+      "(max-width: 600px) and (hover: none) and (pointer: coarse)"
+    ).matches;
+  }
+
+  function updateWelcomeCopy() {
+    if (!welcomeMessage) return;
+    welcomeMessage.textContent = isSmartphone()
+      ? WELCOME_TEXT_PHONE
+      : WELCOME_TEXT_DESKTOP;
+  }
 
   function dismissWelcome(enableSound) {
     if (!welcomeOverlay || document.body.classList.contains("is-welcome-closing")) {
@@ -559,6 +584,10 @@
   }
 
   if (welcomeOverlay) {
+    updateWelcomeCopy();
+    window.addEventListener("resize", updateWelcomeCopy);
+    window.addEventListener("orientationchange", updateWelcomeCopy);
+
     /* Block outside clicks from dismissing the dialog */
     welcomeOverlay.addEventListener("click", function (event) {
       if (event.target === welcomeOverlay) {
